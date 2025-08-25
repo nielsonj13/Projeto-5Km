@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Projeto 5KM</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <main class="container">
+        <header>
+            <h1 id="main-title">Meu Plano de Corrida</h1>
+            <p id="progress-counter">Você completou 0 de 24 treinos.</p>
+        </header>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semana</th>
+                        <th>Treino 1</th>
+                        <th>Treino 2</th>
+                        <th>Treino 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td class="training-cell">Corra 1 min, caminhe 2 min (repita 8x)</td>
+                        <td class="training-cell">Corra 1 min, caminhe 2 min (repita 8x)</td>
+                        <td class="training-cell">Corra 1 min, caminhe 2 min (repita 8x)</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="training-cell">Corra 2 min, caminhe 2 min (repita 6x)</td>
+                        <td class="training-cell">Corra 2 min, caminhe 2 min (repita 6x)</td>
+                        <td class="training-cell">Corra 3 min, caminhe 2 min (repita 5x)</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td class="training-cell">Corra 3 min, caminhe 2 min (repita 5x)</td>
+                        <td class="training-cell">Corra 5 min, caminhe 3 min (repita 4x)</td>
+                        <td class="training-cell">Corra 5 min, caminhe 3 min (repita 4x)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td class="training-cell">Corra 5 min, caminhe 2 min (repita 4x)</td>
+                        <td class="training-cell">Corra 6 min, caminhe 2 min (repita 3x)</td>
+                        <td class="training-cell">Corra 8 min, caminhe 2 min (repita 3x)</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td class="training-cell">Corra 8 min, caminhe 2 min (repita 3x)</td>
+                        <td class="training-cell">Corra 10 min, caminhe 2 min (repita 2x)</td>
+                        <td class="training-cell">Corra 10 min, caminhe 2 min (repita 2x)</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td class="training-cell">Corra 12 min, caminhe 2 min (repita 2x)</td>
+                        <td class="training-cell">Corra 15 min, caminhe 2 min (repita 2x)</td>
+                        <td class="training-cell">Corra 20 min, caminhe 2 min (repita 1x)</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td class="training-cell">Corra 20 min</td>
+                        <td class="training-cell">Corra 25 min</td>
+                        <td class="training-cell">Corra 28 min</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td class="training-cell">Corra 25 min</td>
+                        <td class="training-cell">Corra 28 min</td>
+                        <td class="training-cell">Corra 5 km</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="chronometer-modal" class="hidden">
+        <div class="chrono-container">
+            <button id="chrono-close-btn">&times;</button>
+            <div id="chrono-status">COMECE O TREINO</div>
+            <div id="chrono-time">00:00</div>
+            <div id="chrono-reps">Repetições: 0/0</div>
+            <div class="chrono-controls">
+                <button id="chrono-start-pause-btn">Iniciar</button>
+                <button id="chrono-reset-btn">Resetar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

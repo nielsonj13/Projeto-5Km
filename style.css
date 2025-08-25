@@ -1,0 +1,89 @@
+:root {
+    --primary-color: #c039ff;
+    --primary-glow: rgba(192, 57, 255, 0.2);
+    --background-color: #121212;
+    --surface-color: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-secondary-color: #adb5bd;
+    --table-header-bg: #2c2c2e;
+    --table-border-color: #495057;
+    --cell-completed-bg: rgba(192, 57, 255, 0.2);
+    --cell-completed-text: #c039ff;
+    --cell-hover-bg: #343a40;
+}
+
+body {
+    /* Usando a fonte do sistema iOS para um visual mais nativo */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    /* Adicionando preenchimento para respeitar as 'safe areas' do iPhone */
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    /* Prevenindo o iOS de aumentar o texto ao virar o celular */
+    -webkit-text-size-adjust: 100%;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    border: 1px solid var(--table-border-color);
+    box-shadow: 0 0 15px var(--primary-glow);
+    transition: box-shadow 0.3s ease;
+    box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+}
+
+/* O resto do código principal permanece o mesmo... */
+.container:hover { box-shadow: 0 0 25px var(--primary-glow); }
+header { text-align: center; margin-bottom: 30px; border-top: 3px solid var(--primary-color); padding-top: 20px; }
+h1 { color: var(--primary-color); margin-bottom: 10px; font-weight: 700; letter-spacing: 1px; }
+#progress-counter { font-size: 1.1em; color: var(--text-secondary-color); font-weight: bold; }
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: center; }
+th, td { padding: 12px 15px; border: 1px solid var(--table-border-color); }
+thead th { background-color: var(--table-header-bg); color: #ffffff; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+tbody tr { transition: background-color 0.3s ease; }
+tbody tr:hover { background-color: var(--cell-hover-bg); }
+tbody td:first-child { font-weight: bold; color: var(--primary-color); font-size: 1.1em; }
+.training-cell { cursor: pointer; transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; -webkit-tap-highlight-color: transparent; /* Remove o highlight cinza do toque no iOS */ }
+.training-cell.completed { background-color: var(--cell-completed-bg); color: var(--cell-completed-text) !important; text-decoration: line-through; text-decoration-color: rgba(192, 57, 255, 0.5); font-style: italic; font-weight: bold; }
+.training-cell.completed::after { content: ' ✔️'; font-style: normal; }
+
+/* ESTILOS DO CRONÔMETRO */
+#chronometer-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+#chronometer-modal:not(.hidden) { opacity: 1; pointer-events: all; }
+.chrono-container { background-color: var(--surface-color); padding: 30px 20px; border-radius: 15px; text-align: center; border: 1px solid var(--primary-color); box-shadow: 0 0 25px var(--primary-glow); position: relative; width: 90%; max-width: 400px; box-sizing: border-box; }
+#chrono-close-btn { position: absolute; top: 5px; right: 10px; background: none; border: none; color: var(--text-secondary-color); font-size: 2.5rem; cursor: pointer; }
+#chrono-status { font-size: 1.8rem; font-weight: bold; color: var(--primary-color); margin-bottom: 15px; min-height: 50px; }
+#chrono-time { font-size: 5rem; font-weight: 700; margin-bottom: 15px; line-height: 1; }
+#chrono-reps { font-size: 1.2rem; color: var(--text-secondary-color); margin-bottom: 30px; }
+.chrono-controls button { font-size: 1.2rem; padding: 10px 30px; margin: 0 10px; border-radius: 8px; cursor: pointer; border: 2px solid var(--primary-color); background-color: transparent; color: var(--primary-color); transition: all 0.3s ease; -webkit-tap-highlight-color: transparent; }
+.chrono-controls button:hover { background-color: var(--primary-color); color: #fff; }
+
+/* Responsividade Geral (Tablets e celulares maiores) */
+@media (max-width: 600px) {
+    body { padding: 10px; padding-top: env(safe-area-inset-top); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); }
+    .container { padding: 15px; border: none; box-shadow: none; }
+    th, td { padding: 10px 8px; font-size: 0.9em; }
+    h1 { font-size: 1.5em; }
+    #progress-counter { font-size: 1em; }
+    #chrono-time { font-size: 4.5rem; }
+    #chrono-status { font-size: 1.5rem; }
+}
+
+/* Ajustes finos para celulares pequenos (Ex: iPhone SE) */
+@media (max-width: 400px) {
+    h1 { font-size: 1.4em; }
+    th, td { font-size: 0.85em; }
+    #chrono-time { font-size: 3.8rem; }
+    #chrono-status { font-size: 1.4rem; }
+    .chrono-controls button { font-size: 1rem; padding: 10px 20px; }
+}
