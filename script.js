@@ -106,6 +106,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const reps = repsMatch ? parseInt(repsMatch[1], 10) : 1;
         return { type: 'interval', runTime, walkTime, totalReps: reps, currentRep: 1, isRunPhase: true, timeLeft: runTime, isPaused: true };
     };
+    
+    const openChronoOrToggleCompletion = (cell) => {
+        if (cell.classList.contains('completed')) {
+            if (confirm("Este treino já está concluído. Deseja marcá-lo como não concluído?")) {
+                cell.classList.remove('completed');
+                saveProgress();
+                updateProgressCounter();
+            }
+            return;
+        }
+
+        const workoutText = cell.textContent;
+        currentWorkout = parseWorkoutText(workoutText);
+        activeCell = cell;
+
+        if (currentWorkout.type === 'distance') {
+            alert(`Treino de hoje: ${currentWorkout.description}. Use um app de corrida para marcar a distância. Clique em 'OK' para marcar como concluído.`);
+            cell.classList.add('completed');
+            saveProgress();
+            updateProgressCounter();
+            return;
+        }
+
+        currentWorkout.isPaused = true;
+        startPauseBtn.textContent = 'Iniciar';
+        updateChronoDisplay();
+        chronoModal.classList.remove('hidden');
+
+        const isScreenOffActive = localStorage.getItem(screenOffKey) === 'true';
+        setScreenOffMode(isScreenOffActive);
+    };
+
     const updateChronoDisplay = () => {
         const minutes = Math.floor(currentWorkout.timeLeft / 60).toString().padStart(2, '0');
         const seconds = (currentWorkout.timeLeft % 60).toString().padStart(2, '0');
@@ -114,13 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
         chronoReps.textContent = `Repetições: ${currentWorkout.currentRep}/${currentWorkout.totalReps}`;
     };
     
-    // -- FUNÇÃO OTIMIZADA --
     const timerTick = () => {
         if (currentWorkout.isPaused) return;
         currentWorkout.timeLeft--;
 
-        // Otimização de Bateria: Só atualiza a interface visual se o ecrã não estiver preto.
-        // A contagem do tempo e os alertas sonoros continuam a funcionar em fundo.
         if (!document.body.classList.contains('black-screen-mode')) {
             updateChronoDisplay();
         }
@@ -144,28 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- FUNÇÕES DE CONTROLO DO CRONÓMETRO ---
-    const openChrono = (cell) => {
-        const workoutText = cell.textContent;
-        currentWorkout = parseWorkoutText(workoutText);
-        activeCell = cell;
-
-        if (currentWorkout.type === 'distance') {
-            alert(`Treino de hoje: ${currentWorkout.description}. Use um app de corrida para marcar a distância. Clique em 'OK' para marcar como concluído.`);
-            cell.classList.add('completed');
-            saveProgress();
-            updateProgressCounter();
-            return;
-        }
-
-        currentWorkout.isPaused = true;
-        startPauseBtn.textContent = 'Iniciar';
-        updateChronoDisplay();
-        chronoModal.classList.remove('hidden');
-
-        const isScreenOffActive = localStorage.getItem(screenOffKey) === 'true';
-        setScreenOffMode(isScreenOffActive);
-    };
-    
     const closeChrono = () => {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -198,9 +205,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- EVENT LISTENERS (OUVINTES DE EVENTOS) ---
-    trainingCells.forEach(cell => { cell.addEventListener('click', () => openChrono(cell)); });
+    trainingCells.forEach(cell => { cell.addEventListener('click', () => openChronoOrToggleCompletion(cell)); });
+    
     startPauseBtn.addEventListener('click', toggleStartPause);
-    resetBtn.addEventListener('click', () => openChrono(activeCell));
+    
+    // -- EVENTO MODIFICADO --
+    resetBtn.addEventListener('click', () => {
+        // Adiciona a confirmação antes de resetar
+        if (confirm("Tem a certeza que deseja resetar o cronómetro e começar este treino do início?")) {
+            // Se o utilizador confirmar, o cronómetro é "reaberto", o que efetivamente o reseta.
+            openChronoOrToggleCompletion(activeCell);
+        }
+    });
+
     closeBtn.addEventListener('click', closeChrono);
     screenOffBtn.addEventListener('click', toggleScreenOffMode);
     exitScreenOffBtn.addEventListener('click', toggleScreenOffMode);
