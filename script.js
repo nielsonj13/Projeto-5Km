@@ -37,15 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (action === 'request' && !wakeLock) {
                 try {
                     wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock ativado/reativado!');
                 } catch (err) { console.error(`${err.name}, ${err.message}`); }
             } else if (action === 'release' && wakeLock) {
                 await wakeLock.release();
                 wakeLock = null;
+                console.log('Wake Lock libertado.');
             }
         }
     };
 
-    // --- LÓGICA DO MODO ECRÃ PRETO (POUPANÇA MÁXIMA) ---
+    // --- LÓGICA DE VISIBILIDADE DA PÁGINA ---
+    // Reativa o Wake Lock quando o utilizador volta para a aplicação
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && timerInterval && !currentWorkout.isPaused) {
+            manageWakeLock('request');
+        }
+    };
+
+    // --- LÓGICA DO MODO ECRÃ PRETO ---
     const setScreenOffMode = (shouldBeActive) => {
         document.body.classList.toggle('black-screen-mode', shouldBeActive);
         screenOffBtn.classList.toggle('active', shouldBeActive);
@@ -57,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setScreenOffMode(willBeActive);
     };
 
-    // --- LÓGICA DE PERSONALIZAÇÃO (NOME DO UTILIZADOR) ---
+    // --- LÓGICA DE PERSONALIZAÇÃO ---
     const personalizeGreeting = () => {
         let runnerName = localStorage.getItem(nameStorageKey);
         if (!runnerName) {
@@ -73,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- LÓGICA DE PROGRESSO (CARREGAR E SALVAR) ---
+    // --- LÓGICA DE PROGRESSO ---
     const loadProgress = () => {
         const savedProgress = JSON.parse(localStorage.getItem(storageKey)) || [];
         savedProgress.forEach(cellIndex => {
@@ -106,38 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const reps = repsMatch ? parseInt(repsMatch[1], 10) : 1;
         return { type: 'interval', runTime, walkTime, totalReps: reps, currentRep: 1, isRunPhase: true, timeLeft: runTime, isPaused: true };
     };
-    
-    const openChronoOrToggleCompletion = (cell) => {
-        if (cell.classList.contains('completed')) {
-            if (confirm("Este treino já está concluído. Deseja marcá-lo como não concluído?")) {
-                cell.classList.remove('completed');
-                saveProgress();
-                updateProgressCounter();
-            }
-            return;
-        }
-
-        const workoutText = cell.textContent;
-        currentWorkout = parseWorkoutText(workoutText);
-        activeCell = cell;
-
-        if (currentWorkout.type === 'distance') {
-            alert(`Treino de hoje: ${currentWorkout.description}. Use um app de corrida para marcar a distância. Clique em 'OK' para marcar como concluído.`);
-            cell.classList.add('completed');
-            saveProgress();
-            updateProgressCounter();
-            return;
-        }
-
-        currentWorkout.isPaused = true;
-        startPauseBtn.textContent = 'Iniciar';
-        updateChronoDisplay();
-        chronoModal.classList.remove('hidden');
-
-        const isScreenOffActive = localStorage.getItem(screenOffKey) === 'true';
-        setScreenOffMode(isScreenOffActive);
-    };
-
     const updateChronoDisplay = () => {
         const minutes = Math.floor(currentWorkout.timeLeft / 60).toString().padStart(2, '0');
         const seconds = (currentWorkout.timeLeft % 60).toString().padStart(2, '0');
@@ -145,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chronoStatus.textContent = currentWorkout.isRunPhase ? "CORRA!" : "CAMINHE";
         chronoReps.textContent = `Repetições: ${currentWorkout.currentRep}/${currentWorkout.totalReps}`;
     };
-    
     const timerTick = () => {
         if (currentWorkout.isPaused) return;
         currentWorkout.timeLeft--;
@@ -173,6 +150,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- FUNÇÕES DE CONTROLO DO CRONÓMETRO ---
+    const openChrono = (cell) => {
+        const workoutText = cell.textContent;
+        currentWorkout = parseWorkoutText(workoutText);
+        activeCell = cell;
+
+        if (currentWorkout.type === 'distance') {
+            alert(`Treino de hoje: ${currentWorkout.description}. Use um app de corrida para marcar a distância. Clique em 'OK' para marcar como concluído.`);
+            cell.classList.add('completed');
+            saveProgress();
+            updateProgressCounter();
+            return;
+        }
+
+        currentWorkout.isPaused = true;
+        startPauseBtn.textContent = 'Iniciar';
+        updateChronoDisplay();
+        chronoModal.classList.remove('hidden');
+
+        const isScreenOffActive = localStorage.getItem(screenOffKey) === 'true';
+        setScreenOffMode(isScreenOffActive);
+    };
+
+    const handleCellClick = (cell) => {
+        if (cell.classList.contains('completed')) {
+            if (confirm("Este treino já está concluído. Deseja marcá-lo como não concluído?")) {
+                cell.classList.remove('completed');
+                saveProgress();
+                updateProgressCounter();
+            }
+        } else {
+            openChrono(cell);
+        }
+    };
+
     const closeChrono = () => {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -205,36 +216,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- EVENT LISTENERS (OUVINTES DE EVENTOS) ---
-    trainingCells.forEach(cell => { cell.addEventListener('click', () => openChronoOrToggleCompletion(cell)); });
+    trainingCells.forEach(cell => { cell.addEventListener('click', () => handleCellClick(cell)); });
     
     startPauseBtn.addEventListener('click', toggleStartPause);
     
-    // -- EVENTO MODIFICADO --
     resetBtn.addEventListener('click', () => {
-        // Adiciona a confirmação antes de resetar
         if (confirm("Tem a certeza que deseja resetar o cronómetro e começar este treino do início?")) {
-            // Se o utilizador confirmar, o cronómetro é "reaberto", o que efetivamente o reseta.
-            openChronoOrToggleCompletion(activeCell);
+            closeChrono();
+            openChrono(activeCell);
         }
     });
 
     closeBtn.addEventListener('click', closeChrono);
     screenOffBtn.addEventListener('click', toggleScreenOffMode);
     exitScreenOffBtn.addEventListener('click', toggleScreenOffMode);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // --- INICIALIZAÇÃO DA PÁGINA ---
     personalizeGreeting();
     loadProgress();
-    // --- NOVO: REGISTO DO SERVICE WORKER ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(registration => {
-                    console.log('Service Worker registado com sucesso:', registration.scope);
-                })
-                .catch(error => {
-                    console.log('Falha no registo do Service Worker:', error);
-                });
-        });
-    }
 });
