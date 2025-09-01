@@ -1,0 +1,21 @@
+{
+    "name": "Projeto 5Km",
+    "short_name": "5Km",
+    "description": "Um plano de treino de 8 semanas para o ajudar a correr 5Km.",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#121212",
+    "theme_color": "#c039ff",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

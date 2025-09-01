@@ -225,4 +225,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INICIALIZAÇÃO DA PÁGINA ---
     personalizeGreeting();
     loadProgress();
+    // --- NOVO: REGISTO DO SERVICE WORKER ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registado com sucesso:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Falha no registo do Service Worker:', error);
+                });
+        });
+    }
 });
