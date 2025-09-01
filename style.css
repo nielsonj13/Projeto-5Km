@@ -1,3 +1,9 @@
+/* ==========================================================================
+   Projeto 5Km - Folha de Estilos
+   Versão Final - Organizado por secções para melhor legibilidade.
+   ========================================================================== */
+
+/* --- 1. CONFIGURAÇÕES GLOBAIS E VARIÁVEIS (ROOT) --- */
 :root {
     --primary-color: #c039ff;
     --primary-glow: rgba(192, 57, 255, 0.2);
@@ -25,6 +31,7 @@ body {
     -webkit-text-size-adjust: 100%;
 }
 
+/* --- 2. LAYOUT PRINCIPAL E TIPOGRAFIA --- */
 .container {
     width: 100%;
     max-width: 900px;
@@ -38,71 +45,299 @@ body {
     box-sizing: border-box;
 }
 
-.container:hover { box-shadow: 0 0 25px var(--primary-glow); }
-header { text-align: center; margin-bottom: 30px; border-top: 3px solid var(--primary-color); padding-top: 20px; }
-h1 { color: var(--primary-color); margin-bottom: 10px; font-weight: 700; letter-spacing: 1px; }
-#progress-counter { font-size: 1.1em; color: var(--text-secondary-color); font-weight: bold; }
-.table-container { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; text-align: center; }
-th, td { padding: 12px 15px; border: 1px solid var(--table-border-color); }
-thead th { background-color: var(--table-header-bg); color: #ffffff; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-tbody tr { transition: background-color 0.3s ease; }
-tbody tr:hover { background-color: var(--cell-hover-bg); }
-tbody td:first-child { font-weight: bold; color: var(--primary-color); font-size: 1.1em; }
-.training-cell { cursor: pointer; transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; -webkit-tap-highlight-color: transparent; }
-.training-cell.completed { background-color: var(--cell-completed-bg); color: var(--cell-completed-text) !important; text-decoration: line-through; text-decoration-color: rgba(192, 57, 255, 0.5); font-style: italic; font-weight: bold; }
-.training-cell.completed::after { content: ' ✔️'; font-style: normal; }
+.container:hover {
+    box-shadow: 0 0 25px var(--primary-glow);
+}
 
-#chronometer-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-#chronometer-modal:not(.hidden) { opacity: 1; pointer-events: all; }
-.chrono-container { background-color: var(--surface-color); padding: 30px 20px; border-radius: 15px; text-align: center; border: 1px solid var(--primary-color); box-shadow: 0 0 25px var(--primary-glow); position: relative; width: 90%; max-width: 400px; box-sizing: border-box; }
-#chrono-close-btn { position: absolute; top: 5px; right: 10px; background: none; border: none; color: var(--text-secondary-color); font-size: 2.5rem; cursor: pointer; }
-#chrono-status { font-size: 1.8rem; font-weight: bold; color: var(--primary-color); margin-bottom: 15px; min-height: 50px; }
-#chrono-time { font-size: 5rem; font-weight: 700; margin-bottom: 15px; line-height: 1; }
-#chrono-reps { font-size: 1.2rem; color: var(--text-secondary-color); margin-bottom: 30px; }
-.chrono-controls { display: flex; justify-content: center; align-items: center; }
-.chrono-controls button { font-size: 1.2rem; padding: 10px 20px; margin: 0 5px; border-radius: 8px; cursor: pointer; border: 2px solid var(--primary-color); background-color: transparent; color: var(--primary-color); transition: all 0.3s ease; -webkit-tap-highlight-color: transparent; }
-.chrono-controls button:hover { background-color: var(--primary-color); color: #fff; }
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-top: 3px solid var(--primary-color);
+    padding-top: 20px;
+}
 
-#chrono-energy-saver-btn {
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+#progress-counter {
+    font-size: 1.1em;
+    color: var(--text-secondary-color);
+    font-weight: bold;
+}
+
+/* --- 3. TABELA DE TREINOS --- */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+th,
+td {
+    padding: 12px 15px;
+    border: 1px solid var(--table-border-color);
+}
+
+thead th {
+    background-color: var(--table-header-bg);
+    color: #ffffff;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+tbody tr:hover {
+    background-color: var(--cell-hover-bg);
+}
+
+tbody td:first-child {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.training-cell {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.training-cell.completed {
+    background-color: var(--cell-completed-bg);
+    color: var(--cell-completed-text) !important;
+    text-decoration: line-through;
+    text-decoration-color: rgba(192, 57, 255, 0.5);
+    font-style: italic;
+    font-weight: bold;
+}
+
+.training-cell.completed::after {
+    content: ' ✔️';
+    font-style: normal;
+}
+
+/* --- 4. MODAL DO CRONÓMETRO --- */
+#chronometer-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+#chronometer-modal:not(.hidden) {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.chrono-container {
+    background-color: var(--surface-color);
+    padding: 30px 20px;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 25px var(--primary-glow);
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    box-sizing: border-box;
+    z-index: 1002;
+    transition: opacity 0.5s linear, visibility 0.5s;
+}
+
+#chrono-close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-secondary-color);
+    font-size: 2.5rem;
+    cursor: pointer;
+}
+
+#chrono-status {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    min-height: 50px;
+}
+
+#chrono-time {
+    font-size: 5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1;
+}
+
+#chrono-reps {
+    font-size: 1.2rem;
+    color: var(--text-secondary-color);
+    margin-bottom: 30px;
+}
+
+.chrono-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chrono-controls button {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid var(--primary-color);
+    background-color: transparent;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.chrono-controls button:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+/* --- 5. MODO ECRÃ PRETO (POUPANÇA DE BATERIA) --- */
+#chrono-screen-off-btn {
     padding: 10px 15px;
     font-size: 1.5rem;
     border-color: #f0e68c;
     color: #f0e68c;
 }
-#chrono-energy-saver-btn.active {
+
+#chrono-screen-off-btn.active {
     background-color: #f0e68c;
     color: var(--surface-color);
 }
-body.energy-saver-overlay {
-    position: relative;
+
+#exit-screen-off-btn {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1003;
+    background: transparent;
+    border: 2px solid #f0e68c;
+    color: #f0e68c;
+    font-size: 3rem;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
-body.energy-saver-overlay::after {
+
+#exit-screen-off-btn:hover {
+    background-color: #f0e68c;
+    color: var(--background-color);
+    box-shadow: 0 0 20px #f0e68c;
+}
+
+body.black-screen-mode::after {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 999;
-    pointer-events: none;
+    background-color: #000;
+    z-index: 1001;
 }
 
+body.black-screen-mode #chronometer-modal {
+    visibility: hidden;
+}
+
+body.black-screen-mode #exit-screen-off-btn {
+    display: block;
+}
+
+/* --- 6. RESPONSIVIDADE (MEDIA QUERIES) --- */
+/* Para tablets e telemóveis maiores */
 @media (max-width: 600px) {
-    body { padding: 10px; padding-top: env(safe-area-inset-top); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); }
-    .container { padding: 15px; border: none; box-shadow: none; }
-    th, td { padding: 10px 8px; font-size: 0.9em; }
-    h1 { font-size: 1.5em; }
-    #progress-counter { font-size: 1em; }
-    #chrono-time { font-size: 4.5rem; }
-    #chrono-status { font-size: 1.5rem; }
+    body {
+        padding: 10px;
+        padding-top: env(safe-area-inset-top);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+    }
+
+    .container {
+        padding: 15px;
+        border: none;
+        box-shadow: none;
+    }
+
+    th,
+    td {
+        padding: 10px 8px;
+        font-size: 0.9em;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    #progress-counter {
+        font-size: 1em;
+    }
+
+    #chrono-time {
+        font-size: 4.5rem;
+    }
+
+    #chrono-status {
+        font-size: 1.5rem;
+    }
 }
 
+/* Para telemóveis mais pequenos (ex: iPhone SE) */
 @media (max-width: 400px) {
-    h1 { font-size: 1.4em; }
-    th, td { font-size: 0.85em; }
-    #chrono-time { font-size: 3.8rem; }
-    #chrono-status { font-size: 1.4rem; }
-    .chrono-controls button { font-size: 1rem; padding: 10px 15px; }
+    h1 {
+        font-size: 1.4em;
+    }
+
+    th,
+    td {
+        font-size: 0.85em;
+    }
+
+    #chrono-time {
+        font-size: 3.8rem;
+    }
+
+    #chrono-status {
+        font-size: 1.4rem;
+    }
+
+    .chrono-controls button {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
 }
