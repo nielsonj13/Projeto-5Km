@@ -15,21 +15,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('chrono-close-btn');
     const screenOffBtn = document.getElementById('chrono-screen-off-btn');
     const exitScreenOffBtn = document.getElementById('exit-screen-off-btn');
+    const muteBtn = document.getElementById('chrono-mute-btn');
 
     const storageKey = 'runningPlanProgress';
     const nameStorageKey = 'runnerName';
     const screenOffKey = 'screenOffActive';
+    const muteKey = 'muteActive';
 
     let timerInterval = null;
     let currentWorkout = {};
     let activeCell = null;
     let wakeLock = null;
+    let isMuted = false;
 
     // --- ÁUDIOS DO PROJETO ---
     const startSound = new Audio('iniciar.opus');
     const runSound = new Audio('correr.opus');
     const walkSound = new Audio('caminhar.opus');
     const finishSound = new Audio('finalizar.opus');
+    
+    // --- LÓGICA DE FEEDBACK (SOM OU VIBRAÇÃO) ---
+    const playFeedback = (sound, vibrationPattern = [500]) => {
+        if (isMuted) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(vibrationPattern);
+            }
+        } else {
+            sound.play();
+        }
+    };
+
+    // --- LÓGICA DO MUTE ---
+    const setMuteState = (shouldBeMuted) => {
+        isMuted = shouldBeMuted;
+        muteBtn.classList.toggle('muted', isMuted);
+        muteBtn.textContent = isMuted ? '🔇' : '🔊';
+        localStorage.setItem(muteKey, isMuted);
+    };
+
+    const toggleMute = () => {
+        setMuteState(!isMuted);
+    };
+
+    const loadMutePreference = () => {
+        const isMuteActive = localStorage.getItem(muteKey) === 'true';
+        setMuteState(isMuteActive);
+    };
 
     // --- LÓGICA DO WAKE LOCK (MANTER ECRÃ ATIVO) ---
     const manageWakeLock = async (action) => {
@@ -48,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- LÓGICA DE VISIBILIDADE DA PÁGINA ---
-    // Reativa o Wake Lock quando o utilizador volta para a aplicação
     const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible' && timerInterval && !currentWorkout.isPaused) {
             manageWakeLock('request');
@@ -133,13 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (currentWorkout.timeLeft < 0) {
             if (currentWorkout.isRunPhase && currentWorkout.walkTime > 0) {
-                walkSound.play();
+                playFeedback(walkSound);
                 currentWorkout.isRunPhase = false;
                 currentWorkout.timeLeft = currentWorkout.walkTime;
             } else {
                 currentWorkout.currentRep++;
                 if (currentWorkout.currentRep <= currentWorkout.totalReps) {
-                    runSound.play();
+                    playFeedback(runSound);
                     currentWorkout.isRunPhase = true;
                     currentWorkout.timeLeft = currentWorkout.runTime;
                 } else {
@@ -154,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const workoutText = cell.textContent;
         currentWorkout = parseWorkoutText(workoutText);
         activeCell = cell;
-
         if (currentWorkout.type === 'distance') {
             alert(`Treino de hoje: ${currentWorkout.description}. Use um app de corrida para marcar a distância. Clique em 'OK' para marcar como concluído.`);
             cell.classList.add('completed');
@@ -162,16 +191,13 @@ document.addEventListener('DOMContentLoaded', () => {
             updateProgressCounter();
             return;
         }
-
         currentWorkout.isPaused = true;
         startPauseBtn.textContent = 'Iniciar';
         updateChronoDisplay();
         chronoModal.classList.remove('hidden');
-
         const isScreenOffActive = localStorage.getItem(screenOffKey) === 'true';
         setScreenOffMode(isScreenOffActive);
     };
-
     const handleCellClick = (cell) => {
         if (cell.classList.contains('completed')) {
             if (confirm("Este treino já está concluído. Deseja marcá-lo como não concluído?")) {
@@ -183,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
             openChrono(cell);
         }
     };
-
     const closeChrono = () => {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -191,23 +216,21 @@ document.addEventListener('DOMContentLoaded', () => {
         chronoModal.classList.add('hidden');
         setScreenOffMode(false);
     };
-    
     const finishWorkout = () => {
-        finishSound.play();
+        playFeedback(finishSound, [500, 200, 500]);
         activeCell.classList.add('completed');
         saveProgress();
         updateProgressCounter();
         chronoStatus.textContent = "TREINO CONCLUÍDO!";
         setTimeout(closeChrono, 2000);
     };
-
     const toggleStartPause = () => {
         currentWorkout.isPaused = !currentWorkout.isPaused;
         startPauseBtn.textContent = currentWorkout.isPaused ? 'Continuar' : 'Pausar';
         manageWakeLock(currentWorkout.isPaused ? 'release' : 'request');
-
         if (!currentWorkout.isPaused && !timerInterval) {
-            startSound.play();
+            playFeedback(startSound);
+// "Destrava" os outros áudios para o navegador móvel
             runSound.play(); runSound.pause(); runSound.currentTime = 0;
             walkSound.play(); walkSound.pause(); walkSound.currentTime = 0;
             finishSound.play(); finishSound.pause(); finishSound.currentTime = 0;
@@ -230,9 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
     closeBtn.addEventListener('click', closeChrono);
     screenOffBtn.addEventListener('click', toggleScreenOffMode);
     exitScreenOffBtn.addEventListener('click', toggleScreenOffMode);
+    muteBtn.addEventListener('click', toggleMute);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // --- INICIALIZAÇÃO DA PÁGINA ---
     personalizeGreeting();
     loadProgress();
+    loadMutePreference();
 });

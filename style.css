@@ -197,41 +197,60 @@ tbody td:first-child {
     margin-bottom: 30px;
 }
 
+/* --- ESTA É A SECÇÃO CORRIGIDA --- */
 .chrono-controls {
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Coloca as linhas uma sobre a outra */
     align-items: center;
+    gap: 10px; /* Espaço entre as duas linhas de botões */
 }
 
+.control-row {
+    display: flex; /* Faz os botões ficarem um ao lado do outro */
+    justify-content: center;
+    gap: 15px; /* Espaço entre os botões na mesma linha */
+}
+
+/* Estilo UNIFICADO para TODOS os botões, como no design original */
 .chrono-controls button {
     font-size: 1.2rem;
-    padding: 10px 20px;
-    margin: 0 5px;
+    padding: 10px 35px;
+    margin: 0;
     border-radius: 8px;
     cursor: pointer;
+    font-weight: bold;
     border: 2px solid var(--primary-color);
     background-color: transparent;
     color: var(--primary-color);
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
+    flex-grow: 1; /* Faz os botões na mesma linha terem larguras iguais */
+    max-width: 160px;
 }
 
 .chrono-controls button:hover {
     background-color: var(--primary-color);
     color: #fff;
+    transform: scale(1.05);
 }
 
-/* --- 5. MODO ECRÃ PRETO (POUPANÇA DE BATERIA) --- */
-#chrono-screen-off-btn {
-    padding: 10px 15px;
-    font-size: 1.5rem;
-    border-color: #f0e68c;
-    color: #f0e68c;
-}
+/* Os ícones dos botões especiais mantêm a sua cor original */
+#chrono-screen-off-btn { color: #f0e68c; }
+#chrono-mute-btn { color: #64b5f6; }
 
+
+/* --- 5. MODO ECRÃ PRETO E ESTADOS DE BOTÕES ESPECIAIS --- */
+/* Apenas os estilos para o estado ATIVO dos botões especiais */
 #chrono-screen-off-btn.active {
-    background-color: #f0e68c;
+    background-color: #c039ff;
     color: var(--surface-color);
+    border-color: #c039ff;
+}
+
+#chrono-mute-btn.muted {
+    background-color: #c039ff;
+    color: var(--surface-color);
+    border-color: #c039ff;
 }
 
 #exit-screen-off-btn {
@@ -242,8 +261,8 @@ tbody td:first-child {
     transform: translate(-50%, -50%);
     z-index: 1003;
     background: transparent;
-    border: 2px solid #f0e68c;
-    color: #f0e68c;
+    border: 2px solid #c039ff;
+    color: #c039ff;
     font-size: 3rem;
     width: 80px;
     height: 80px;
@@ -253,9 +272,9 @@ tbody td:first-child {
 }
 
 #exit-screen-off-btn:hover {
-    background-color: #f0e68c;
+    background-color: #c039ff;
     color: var(--background-color);
-    box-shadow: 0 0 20px #f0e68c;
+    box-shadow: 0 0 20px #c039ff;
 }
 
 body.black-screen-mode::after {
@@ -278,7 +297,6 @@ body.black-screen-mode #exit-screen-off-btn {
 }
 
 /* --- 6. RESPONSIVIDADE (MEDIA QUERIES) --- */
-/* Para tablets e telemóveis maiores */
 @media (max-width: 600px) {
     body {
         padding: 10px;
@@ -287,55 +305,42 @@ body.black-screen-mode #exit-screen-off-btn {
         padding-bottom: env(safe-area-inset-bottom);
         padding-left: env(safe-area-inset-left);
     }
-
     .container {
         padding: 15px;
         border: none;
         box-shadow: none;
     }
-
-    th,
-    td {
+    th, td {
         padding: 10px 8px;
         font-size: 0.9em;
     }
-
     h1 {
         font-size: 1.5em;
     }
-
     #progress-counter {
         font-size: 1em;
     }
-
     #chrono-time {
         font-size: 4.5rem;
     }
-
     #chrono-status {
         font-size: 1.5rem;
     }
 }
 
-/* Para telemóveis mais pequenos (ex: iPhone SE) */
 @media (max-width: 400px) {
     h1 {
         font-size: 1.4em;
     }
-
-    th,
-    td {
+    th, td {
         font-size: 0.85em;
     }
-
     #chrono-time {
         font-size: 3.8rem;
     }
-
     #chrono-status {
         font-size: 1.4rem;
     }
-
     .chrono-controls button {
         font-size: 1rem;
         padding: 10px 15px;

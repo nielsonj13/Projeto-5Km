@@ -1,6 +1,5 @@
-// A principal alteração: mudámos a versão do cache.
-// Isto força o navegador a apagar o cache antigo e a criar um novo e limpo.
-const CACHE_NAME = 'projeto-5km-cache-v2';
+// Aumentamos a versão para forçar a atualização do cache.
+const CACHE_NAME = 'projeto-5km-cache-v3';
 
 // A lista de ficheiros essenciais continua a mesma.
 const URLS_TO_CACHE = [
@@ -15,67 +14,59 @@ const URLS_TO_CACHE = [
     'finalizar.opus'
 ];
 
-// Evento 'install': continua a guardar os ficheiros na primeira vez.
+// Evento 'install': Guarda os ficheiros essenciais quando o service worker é instalado.
 self.addEventListener('install', (event) => {
-    console.log('Service Worker v2: A instalar...');
+    console.log('Service Worker v3: A instalar...');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('Service Worker v2: A adicionar ficheiros essenciais ao cache.');
-                // Usamos fetch para cada recurso individualmente para mais robustez.
-                const promises = URLS_TO_CACHE.map((url) => {
-                    return fetch(url).then((response) => {
-                        if (!response.ok) {
-                            throw new Error(`Falha ao obter: ${url}`);
-                        }
-                        return cache.put(url, response);
-                    });
-                });
-                return Promise.all(promises);
+                console.log('Service Worker v3: A adicionar ficheiros essenciais ao cache.');
+                return cache.addAll(URLS_TO_CACHE);
             })
-            .then(() => {
-                console.log('Service Worker v2: Ficheiros guardados com sucesso.');
-                return self.skipWaiting();
-            })
-            .catch((error) => {
-                console.error('Service Worker v2: Falha ao guardar ficheiros no cache.', error);
-            })
+            .then(() => self.skipWaiting())
     );
 });
 
-// Evento 'fetch': A nossa nova estratégia mais robusta.
+// Evento 'fetch': Interceta todos os pedidos de rede.
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        // 1. Tenta encontrar no cache primeiro (ideal para o modo offline).
         caches.match(event.request)
             .then((cachedResponse) => {
-                // Se encontrar, retorna a versão do cache.
+                // Se o pedido estiver no cache, retorna a versão guardada.
                 if (cachedResponse) {
                     return cachedResponse;
                 }
-                // 2. Se não encontrar, vai à rede.
+
+                // Se não estiver no cache, vai à rede.
                 return fetch(event.request).then((networkResponse) => {
-                    // E guarda uma cópia no cache para a próxima vez.
-                    return caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
+                    // Clona a resposta para poder guardá-la no cache e enviá-la ao navegador.
+                    const responseToCache = networkResponse.clone();
+
+                    caches.open(CACHE_NAME).then((cache) => {
+                        // --- A CORREÇÃO ESTÁ AQUI ---
+                        // Só tenta guardar no cache se for um pedido web válido (http/https)
+                        if (event.request.url.startsWith('http')) {
+                            cache.put(event.request, responseToCache);
+                        }
                     });
+
+                    return networkResponse;
                 });
             })
     );
 });
 
 
-// Evento 'activate': Limpa os caches antigos (como o v1).
+// Evento 'activate': Limpa os caches antigos (como o v1 e v2).
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker v2: A ativar...');
+    console.log('Service Worker v3: A ativar...');
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        console.log('Service Worker v2: A limpar cache antigo:', cacheName);
+                        console.log('Service Worker v3: A limpar cache antigo:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
