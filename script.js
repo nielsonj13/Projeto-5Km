@@ -2,12 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Elementos da página principal
     const trainingCells = document.querySelectorAll('.training-cell');
     const progressCounter = document.getElementById('progress-counter');
-    const mainTitle = document.getElementById('main-title'); // Novo elemento
+    const mainTitle = document.getElementById('main-title');
     const totalTrainings = trainingCells.length;
     
     // Chaves de armazenamento
     const storageKey = 'runningPlanProgress';
-    const nameStorageKey = 'runnerName'; // Nova chave para o nome
+    const nameStorageKey = 'runnerName';
 
     // Elementos do cronômetro
     const chronoModal = document.getElementById('chronometer-modal');
@@ -29,25 +29,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentWorkout = {};
     let activeCell = null;
 
-    // --- NOVA FUNÇÃO DE PERSONALIZAÇÃO ---
+    // --- FUNÇÃO DE PERSONALIZAÇÃO ---
     const personalizeGreeting = () => {
         let runnerName = localStorage.getItem(nameStorageKey);
 
-        // Se não houver nome salvo, pergunta ao usuário
         if (!runnerName) {
             runnerName = prompt("Olá! Para personalizar seu plano, por favor, digite seu nome:", "");
 
-            // Se o usuário digitou um nome válido, salva e atualiza o título
             if (runnerName && runnerName.trim() !== "") {
                 localStorage.setItem(nameStorageKey, runnerName);
-                mainTitle.textContent = `Plano de Corrida de ${runnerName}`;
+                mainTitle.textContent = `Projeto 5Km de ${runnerName}`;
             } else {
-                // Se o usuário cancelou ou não digitou nada, mantém o padrão
-                mainTitle.textContent = 'Meu Plano de Corrida';
+                mainTitle.textContent = 'Projeto 5Km';
             }
         } else {
-            // Se já existe um nome salvo, apenas atualiza o título
-            mainTitle.textContent = `Plano de Corrida de ${runnerName}`;
+            mainTitle.textContent = `Projeto 5Km de ${runnerName}`;
         }
     };
 
@@ -73,11 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateProgressCounter = () => {
         const completedCount = document.querySelectorAll('.training-cell.completed').length;
-        progressCounter.textContent = `Você completou ${completedCount} de ${totalTrainings} treinos.`;
+        progressCounter.textContent = `Você completou ${completedCount} de 24 treinos.`;
     };
 
-    // O restante do código do cronômetro permanece exatamente o mesmo...
-    // (O código abaixo não foi alterado)
+    // --- LÓGICA DO CRONÔMETRO ---
     const parseWorkoutText = (text) => {
         const runMatch = text.match(/Corra (\d+) min/);
         const walkMatch = text.match(/caminhe (\d+) min/);
@@ -128,7 +123,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleStartPause = () => {
         currentWorkout.isPaused = !currentWorkout.isPaused;
         startPauseBtn.textContent = currentWorkout.isPaused ? 'Continuar' : 'Pausar';
-        if (!currentWorkout.isPaused && !timerInterval) { startSound.play(); timerInterval = setInterval(timerTick, 1000); }
+        
+        if (!currentWorkout.isPaused && !timerInterval) {
+            // 1. Toca o som de início como antes
+            startSound.play();
+    
+            // 2. "Destrava" os outros áudios para o navegador (a correção)
+            // Toca, pausa e reinicia os outros sons para que o navegador os autorize.
+            runSound.play(); runSound.pause(); runSound.currentTime = 0;
+            walkSound.play(); walkSound.pause(); walkSound.currentTime = 0;
+            finishSound.play(); finishSound.pause(); finishSound.currentTime = 0;
+            
+            // 3. Inicia o temporizador como antes
+            timerInterval = setInterval(timerTick, 1000);
+        }
     };
     const resetChrono = () => {
         clearInterval(timerInterval);
@@ -151,6 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
     closeBtn.addEventListener('click', closeChrono);
 
     // --- INICIALIZAÇÃO DA PÁGINA ---
-    personalizeGreeting(); // Chama a nova função de personalização
-    loadProgress();      // Carrega o progresso dos treinos
+    personalizeGreeting();
+    loadProgress();
 });
