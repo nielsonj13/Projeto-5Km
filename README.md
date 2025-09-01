@@ -2,7 +2,7 @@
 
 ![Logo do Projeto 5Km](./logo.png)
 
-[![Website](https://nielsonj13.github.io/Projeto-5Km/)
+[![Website](https://img.shields.io/badge/Acessar-Site-brightgreen?style=for-the-badge)](https://nielsonj13.github.io/Projeto-5Km/)
 
 ## 🚀 Sobre o Projeto
 
