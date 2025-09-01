@@ -2,7 +2,7 @@
 
 ![Logo do Projeto 5Km](./logo.png)
 
-[![Website](https://img.shields.io/badge/Acessar-Site-brightgreen?style=for-the-badge)](https://[SEU_USUARIO_GITHUB].github.io/[NOME_DO_REPOSITORIO]/)
+[![Website](https://nielsonj13.github.io/Projeto-5Km/)
 
 ## 🚀 Sobre o Projeto
 
@@ -36,7 +36,7 @@ Este projeto foi construído utilizando as seguintes tecnologias web:
 ## ⚙️ Como Utilizar
 
 1.  **Aceda ao site:**
-    -   A maneira mais fácil é aceder à versão publicada no GitHub Pages: **[https://[SEU_USUARIO_GITHUB].github.io/[NOME_DO_REPOSITORIO]/](https://[SEU_USUARIO_GITHUB].github.io/[NOME_DO_REPOSITORIO]/)**
+    -   A maneira mais fácil é aceder à versão publicada no GitHub Pages: **[https://nielsonj13.github.io/Projeto-5Km/)**
 
 2.  **Para executar localmente:**
     -   Faça o clone ou o download deste repositório.
