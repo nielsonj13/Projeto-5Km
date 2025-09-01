@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- LÓGICA DO MODO ECRÃ PRETO (REATORADA) ---
+    // --- LÓGICA DO MODO ECRÃ PRETO (POUPANÇA MÁXIMA) ---
     const setScreenOffMode = (shouldBeActive) => {
         document.body.classList.toggle('black-screen-mode', shouldBeActive);
         screenOffBtn.classList.toggle('active', shouldBeActive);
@@ -113,10 +113,18 @@ document.addEventListener('DOMContentLoaded', () => {
         chronoStatus.textContent = currentWorkout.isRunPhase ? "CORRA!" : "CAMINHE";
         chronoReps.textContent = `Repetições: ${currentWorkout.currentRep}/${currentWorkout.totalReps}`;
     };
+    
+    // -- FUNÇÃO OTIMIZADA --
     const timerTick = () => {
         if (currentWorkout.isPaused) return;
         currentWorkout.timeLeft--;
-        updateChronoDisplay();
+
+        // Otimização de Bateria: Só atualiza a interface visual se o ecrã não estiver preto.
+        // A contagem do tempo e os alertas sonoros continuam a funcionar em fundo.
+        if (!document.body.classList.contains('black-screen-mode')) {
+            updateChronoDisplay();
+        }
+
         if (currentWorkout.timeLeft < 0) {
             if (currentWorkout.isRunPhase && currentWorkout.walkTime > 0) {
                 walkSound.play();
@@ -135,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- FUNÇÕES DE CONTROLO DO CRONÓMETRO (Refatoradas) ---
+    // --- FUNÇÕES DE CONTROLO DO CRONÓMETRO ---
     const openChrono = (cell) => {
         const workoutText = cell.textContent;
         currentWorkout = parseWorkoutText(workoutText);
@@ -154,17 +162,16 @@ document.addEventListener('DOMContentLoaded', () => {
         updateChronoDisplay();
         chronoModal.classList.remove('hidden');
 
-        // Carrega a preferência do ecrã preto SÓ quando o modal abre
         const isScreenOffActive = localStorage.getItem(screenOffKey) === 'true';
         setScreenOffMode(isScreenOffActive);
     };
-
+    
     const closeChrono = () => {
         clearInterval(timerInterval);
         timerInterval = null;
         manageWakeLock('release');
         chronoModal.classList.add('hidden');
-        setScreenOffMode(false); // Garante que o modo é sempre desativado ao fechar
+        setScreenOffMode(false);
     };
     
     const finishWorkout = () => {
@@ -193,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- EVENT LISTENERS (OUVINTES DE EVENTOS) ---
     trainingCells.forEach(cell => { cell.addEventListener('click', () => openChrono(cell)); });
     startPauseBtn.addEventListener('click', toggleStartPause);
-    resetBtn.addEventListener('click', () => openChrono(activeCell)); // Reset simplesmente reabre o treino
+    resetBtn.addEventListener('click', () => openChrono(activeCell));
     closeBtn.addEventListener('click', closeChrono);
     screenOffBtn.addEventListener('click', toggleScreenOffMode);
     exitScreenOffBtn.addEventListener('click', toggleScreenOffMode);
