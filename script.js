@@ -34,24 +34,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const walkSound = new Audio('caminhar.opus');
     const finishSound = new Audio('finalizar.opus');
     
-    // --- LÓGICA DE FEEDBACK (SOM OU NOTIFICAÇÃO) ---
-    const showNotification = (title, body) => {
+    // --- LÓGICA DE FEEDBACK (SOM OU NOTIFICAÇÃO PERSONALIZADA) ---
+    const showNotification = (title, body, vibrationPattern = [200]) => {
         if (!('Notification' in window)) {
             console.error('Este navegador não suporta notificações.');
             return;
         }
         if (Notification.permission === 'granted') {
-            new Notification(title, {
+            const options = {
                 body: body,
                 icon: 'logo.png',
+                image: 'logo.png',
+                badge: 'logo.png',
+                vibrate: vibrationPattern,
+                tag: 'projeto-5km-alert',
                 silent: false
-            });
+            };
+            new Notification(title, options);
         }
     };
 
-    const playFeedback = (sound, notificationTitle, notificationBody) => {
+    const playFeedback = (sound, notificationTitle, notificationBody, vibrationPattern) => {
         if (isMuted) {
-            showNotification(notificationTitle, notificationBody);
+            showNotification(notificationTitle, notificationBody, vibrationPattern);
         } else {
             sound.play();
         }
@@ -74,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setMuteState(true);
                 } else {
                     console.log('Permissão para notificações negada.');
-                    setMuteState(true); // Ativa o mute (silêncio) mesmo se negado
+                    setMuteState(true);
                 }
             });
         } else {
@@ -188,13 +193,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (currentWorkout.timeLeft < 0) {
             if (currentWorkout.isRunPhase && currentWorkout.walkTime > 0) {
-                playFeedback(walkSound, "Hora de caminhar!", `Próxima fase: ${currentWorkout.walkTime / 60} minuto(s) de caminhada.`);
+                playFeedback(walkSound, "Hora de caminhar!", `Próxima fase: ${currentWorkout.walkTime / 60} minuto(s) de caminhada.`, [300]);
                 currentWorkout.isRunPhase = false;
                 currentWorkout.timeLeft = currentWorkout.walkTime;
             } else {
                 currentWorkout.currentRep++;
                 if (currentWorkout.currentRep <= currentWorkout.totalReps) {
-                    playFeedback(runSound, "Hora de correr!", `Repetição ${currentWorkout.currentRep} de ${currentWorkout.totalReps}.`);
+                    playFeedback(runSound, "Hora de correr!", `Repetição ${currentWorkout.currentRep} de ${currentWorkout.totalReps}.`, [200, 100, 200]);
                     currentWorkout.isRunPhase = true;
                     currentWorkout.timeLeft = currentWorkout.runTime;
                 } else {
@@ -242,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setScreenOffMode(false);
     };
     const finishWorkout = () => {
-        playFeedback(finishSound, "Treino Concluído!", "Parabéns por completar o treino de hoje!");
+        playFeedback(finishSound, "Treino Concluído!", "Parabéns por completar o treino de hoje!", [500, 200, 500]);
         activeCell.classList.add('completed');
         saveProgress();
         updateProgressCounter();
