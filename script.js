@@ -34,18 +34,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const walkSound = new Audio('caminhar.opus');
     const finishSound = new Audio('finalizar.opus');
     
-    // --- LÓGICA DE FEEDBACK (SOM OU VIBRAÇÃO) ---
-    const playFeedback = (sound, vibrationPattern = [500]) => {
+    // --- LÓGICA DE FEEDBACK (SOM OU NOTIFICAÇÃO) ---
+    const showNotification = (title, body) => {
+        if (!('Notification' in window)) {
+            console.error('Este navegador não suporta notificações.');
+            return;
+        }
+        if (Notification.permission === 'granted') {
+            new Notification(title, {
+                body: body,
+                icon: 'logo.png',
+                silent: false
+            });
+        }
+    };
+
+    const playFeedback = (sound, notificationTitle, notificationBody) => {
         if (isMuted) {
-            if ('vibrate' in navigator) {
-                navigator.vibrate(vibrationPattern);
-            }
+            showNotification(notificationTitle, notificationBody);
         } else {
             sound.play();
         }
     };
 
-    // --- LÓGICA DO MUTE ---
+    // --- LÓGICA DO MUTE E PERMISSÃO DE NOTIFICAÇÃO ---
     const setMuteState = (shouldBeMuted) => {
         isMuted = shouldBeMuted;
         muteBtn.classList.toggle('muted', isMuted);
@@ -54,7 +66,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const toggleMute = () => {
-        setMuteState(!isMuted);
+        const willBeMuted = !isMuted;
+        if (willBeMuted && Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    console.log('Permissão para notificações concedida!');
+                    setMuteState(true);
+                } else {
+                    console.log('Permissão para notificações negada.');
+                    setMuteState(true); // Ativa o mute (silêncio) mesmo se negado
+                }
+            });
+        } else {
+            setMuteState(willBeMuted);
+        }
     };
 
     const loadMutePreference = () => {
@@ -163,13 +188,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (currentWorkout.timeLeft < 0) {
             if (currentWorkout.isRunPhase && currentWorkout.walkTime > 0) {
-                playFeedback(walkSound);
+                playFeedback(walkSound, "Hora de caminhar!", `Próxima fase: ${currentWorkout.walkTime / 60} minuto(s) de caminhada.`);
                 currentWorkout.isRunPhase = false;
                 currentWorkout.timeLeft = currentWorkout.walkTime;
             } else {
                 currentWorkout.currentRep++;
                 if (currentWorkout.currentRep <= currentWorkout.totalReps) {
-                    playFeedback(runSound);
+                    playFeedback(runSound, "Hora de correr!", `Repetição ${currentWorkout.currentRep} de ${currentWorkout.totalReps}.`);
                     currentWorkout.isRunPhase = true;
                     currentWorkout.timeLeft = currentWorkout.runTime;
                 } else {
@@ -217,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setScreenOffMode(false);
     };
     const finishWorkout = () => {
-        playFeedback(finishSound, [500, 200, 500]);
+        playFeedback(finishSound, "Treino Concluído!", "Parabéns por completar o treino de hoje!");
         activeCell.classList.add('completed');
         saveProgress();
         updateProgressCounter();
@@ -229,8 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startPauseBtn.textContent = currentWorkout.isPaused ? 'Continuar' : 'Pausar';
         manageWakeLock(currentWorkout.isPaused ? 'release' : 'request');
         if (!currentWorkout.isPaused && !timerInterval) {
-            playFeedback(startSound);
-// "Destrava" os outros áudios para o navegador móvel
+            playFeedback(startSound, "Treino Iniciado!", `A primeira fase é ${currentWorkout.runTime / 60} minuto(s) de corrida.`);
             runSound.play(); runSound.pause(); runSound.currentTime = 0;
             walkSound.play(); walkSound.pause(); walkSound.currentTime = 0;
             finishSound.play(); finishSound.pause(); finishSound.currentTime = 0;
