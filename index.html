@@ -15,6 +15,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div id="instructions-modal" class="hidden">
+        <div class="modal-content">
+            <h2>Bem-vindo ao Cronómetro!</h2>
+            <p>Antes do seu primeiro treino, aqui ficam umas dicas rápidas:</p>
+            <ul>
+                <li><strong>🔊 Alertas de Voz:</strong> Por defeito, a aplicação usa alertas de voz para o guiar. <strong>Atenção:</strong> isto irá pausar a sua música (Spotify, etc.).</li>
+                <li><strong>🔇 Modo Notificações:</strong> Quer ouvir a sua música? Clique no ícone <strong>🔇</strong>! A aplicação usará notificações silenciosas do sistema, que não interrompem a sua música.</li>
+                <li><strong>🌙 Modo Ecrã Preto:</strong> Para poupar o máximo de bateria, clique no ícone <strong>🌙</strong>. O ecrã ficará preto, mas os alertas continuarão a funcionar.</li>
+            </ul>
+            <button id="close-instructions-btn">Entendido, começar o treino!</button>
+        </div>
+    </div>
 
     <main class="container">
         <header>
@@ -106,7 +118,7 @@
     </div>
 
     <button id="exit-screen-off-btn" title="Sair do Modo Ecrã Preto"></button>
-
+    <button id="help-btn" title="Ver Instruções">?</button>
     <script src="script.js"></script>
 </body>
 </html>

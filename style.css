@@ -239,6 +239,72 @@ tbody td:first-child {
 #chrono-mute-btn { color: #64b5f6; }
 
 
+/* --- ESTILOS DO MODAL DE INSTRUÇÕES --- */
+#instructions-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Fica por cima de tudo */
+    transition: opacity 0.3s ease;
+}
+
+#instructions-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#instructions-modal .modal-content {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 25px var(--primary-glow);
+    text-align: left;
+}
+
+#instructions-modal h2 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-top: 0;
+}
+
+#instructions-modal ul {
+    padding-left: 20px;
+    list-style: '✅ ';
+}
+
+#instructions-modal li {
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+#instructions-modal button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s ease;
+}
+
+#instructions-modal button:hover {
+    transform: scale(1.02);
+}
+
 /* --- 5. MODO ECRÃ PRETO E ESTADOS DE BOTÕES ESPECIAIS --- */
 /* Apenas os estilos para o estado ATIVO dos botões especiais */
 #chrono-screen-off-btn.active {
@@ -296,6 +362,40 @@ body.black-screen-mode #exit-screen-off-btn {
     display: block;
 }
 
+/* --- NOVO: ESTILO DO BOTÃO DE AJUDA FLUTUANTE --- */
+#help-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    
+    /* Efeito "fantasma" semi-transparente */
+    background-color: rgba(30, 30, 30, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px); /* Efeito de vidro fosco para navegadores que suportam */
+    -webkit-backdrop-filter: blur(5px);
+    
+    color: var(--text-color);
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+#help-btn:hover {
+    transform: scale(1.1);
+    background-color: rgba(30, 30, 30, 0.9);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
 /* --- 6. RESPONSIVIDADE (MEDIA QUERIES) --- */
 @media (max-width: 600px) {
     body {
@@ -309,6 +409,8 @@ body.black-screen-mode #exit-screen-off-btn {
         padding: 15px;
         border: none;
         box-shadow: none;
+        margin-bottom: 40px;
+        margin-top: 10px;
     }
     th, td {
         padding: 10px 8px;

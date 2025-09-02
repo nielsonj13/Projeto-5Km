@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainTitle = document.getElementById('main-title');
     const trainingCells = document.querySelectorAll('.training-cell');
     const progressCounter = document.getElementById('progress-counter');
-    const totalTrainings = trainingCells.length;
     const chronoModal = document.getElementById('chronometer-modal');
     const chronoContainer = document.querySelector('.chrono-container');
     const chronoStatus = document.getElementById('chrono-status');
@@ -16,11 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const screenOffBtn = document.getElementById('chrono-screen-off-btn');
     const exitScreenOffBtn = document.getElementById('exit-screen-off-btn');
     const muteBtn = document.getElementById('chrono-mute-btn');
+    const instructionsModal = document.getElementById('instructions-modal');
+    const closeInstructionsBtn = document.getElementById('close-instructions-btn');
+    const helpBtn = document.getElementById('help-btn');
 
+    const totalTrainings = trainingCells.length;
     const storageKey = 'runningPlanProgress';
     const nameStorageKey = 'runnerName';
     const screenOffKey = 'screenOffActive';
     const muteKey = 'muteActive';
+    const instructionsKey = 'instructionsSeen';
 
     let timerInterval = null;
     let currentWorkout = {};
@@ -33,8 +37,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const runSound = new Audio('correr.opus');
     const walkSound = new Audio('caminhar.opus');
     const finishSound = new Audio('finalizar.opus');
+
+    // --- LÓGICA DAS INSTRUÇÕES ---
+    const openInstructions = () => {
+        instructionsModal.classList.remove('hidden');
+    };
+    const closeInstructions = () => {
+        instructionsModal.classList.add('hidden');
+    };
+    const handleFirstTimeUse = () => {
+        const hasSeenInstructions = localStorage.getItem(instructionsKey) === 'true';
+        if (hasSeenInstructions) {
+            openChrono(activeCell);
+        } else {
+            openInstructions();
+        }
+    };
     
-    // --- LÓGICA DE FEEDBACK (SOM OU NOTIFICAÇÃO PERSONALIZADA) ---
+    // --- LÓGICA DE FEEDBACK (SOM OU NOTIFICAÇÃO) ---
     const showNotification = (title, body, vibrationPattern = [200]) => {
         if (!('Notification' in window)) {
             console.error('Este navegador não suporta notificações.');
@@ -211,9 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNÇÕES DE CONTROLO DO CRONÓMETRO ---
     const openChrono = (cell) => {
+        activeCell = cell;
         const workoutText = cell.textContent;
         currentWorkout = parseWorkoutText(workoutText);
-        activeCell = cell;
         if (currentWorkout.type === 'distance') {
             alert(`Treino de hoje: ${currentWorkout.description}. Use um app de corrida para marcar a distância. Clique em 'OK' para marcar como concluído.`);
             cell.classList.add('completed');
@@ -228,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isScreenOffActive = localStorage.getItem(screenOffKey) === 'true';
         setScreenOffMode(isScreenOffActive);
     };
+
     const handleCellClick = (cell) => {
         if (cell.classList.contains('completed')) {
             if (confirm("Este treino já está concluído. Deseja marcá-lo como não concluído?")) {
@@ -236,9 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateProgressCounter();
             }
         } else {
-            openChrono(cell);
+            activeCell = cell;
+            handleFirstTimeUse();
         }
     };
+
     const closeChrono = () => {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -246,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chronoModal.classList.add('hidden');
         setScreenOffMode(false);
     };
+
     const finishWorkout = () => {
         playFeedback(finishSound, "Treino Concluído!", "Parabéns por completar o treino de hoje!", [500, 200, 500]);
         activeCell.classList.add('completed');
@@ -254,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chronoStatus.textContent = "TREINO CONCLUÍDO!";
         setTimeout(closeChrono, 2000);
     };
+
     const toggleStartPause = () => {
         currentWorkout.isPaused = !currentWorkout.isPaused;
         startPauseBtn.textContent = currentWorkout.isPaused ? 'Continuar' : 'Pausar';
@@ -268,6 +293,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- EVENT LISTENERS (OUVINTES DE EVENTOS) ---
+    helpBtn.addEventListener('click', openInstructions);
+
+    closeInstructionsBtn.addEventListener('click', () => {
+        if (localStorage.getItem(instructionsKey) !== 'true') {
+            localStorage.setItem(instructionsKey, 'true');
+            if (activeCell) openChrono(activeCell);
+        }
+        closeInstructions();
+    });
+    
     trainingCells.forEach(cell => { cell.addEventListener('click', () => handleCellClick(cell)); });
     
     startPauseBtn.addEventListener('click', toggleStartPause);
